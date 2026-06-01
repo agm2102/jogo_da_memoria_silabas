@@ -55,7 +55,7 @@ class Partida:
 
         self.imagem_verso_carta = gerenciador_imagens.get("verso")[0]
 
-        self.tempo_desvirar_carta = 60
+        self.tempo_desvirar_carta = 50
         self.timer = 0
         self.desvirando_carta = False
 
@@ -132,7 +132,7 @@ class Partida:
         for event in events:
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
-                    if carta.get_rect().collidepoint(event.pos) and carta.foi_achada() is False:
+                    if carta.get_rect().collidepoint(event.pos) and carta.foi_achada() is False and carta.esta_virada() is False:
                         if self.jogadas_feitas < 2:
                             carta.virar()
                             self.jogadas_feitas += 1
