@@ -55,7 +55,7 @@ class Partida:
 
         self.imagem_verso_carta = gerenciador_imagens.get("verso")[0]
 
-        self.tempo_desvirar_carta = 120
+        self.tempo_desvirar_carta = 60
         self.timer = 0
         self.desvirando_carta = False
 
