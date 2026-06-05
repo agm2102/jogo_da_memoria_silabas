@@ -9,6 +9,8 @@ class Partida:
 
     def __init__(self, gerenciador_imagens):
 
+        self.gerenciador_imagens = gerenciador_imagens
+
         self.SILABAS = {
             0: "BA", 1: "BE", 2: "BI", 3: "BO", 4: "BU",
 
@@ -43,8 +45,9 @@ class Partida:
             75: "ZA", 76: "ZE", 77: "ZI", 78: "ZO", 79: "ZU",
         }
         self.imagens = {
-            letra: gerenciador_imagens.get(f"silabas_{letra}")
-            for letra in ["B", "C", "D", "F", "G", "J", "L", "M", "N", "P", "R", "S", "T", "V"]
+            consoante + vogal: gerenciador_imagens.get(f"silabas_{consoante + vogal}")
+            for consoante in ["B", "C", "D", "F", "G", "J"]
+            for vogal in ["A", "E", "I", "O", "U"]
         }
 
         self.imagens_silabas = [
@@ -53,16 +56,16 @@ class Partida:
             for imagem in lista_imagens
         ]
 
-        self.imagem_verso_carta = gerenciador_imagens.get("verso")[0]
+        self.verso = self.gerenciador_imagens.get("verso")[0]
 
-        self.tempo_desvirar_carta = 50
+        self.tempo_desvirar_carta = 120
         self.timer = 0
         self.desvirando_carta = False
 
         self.deck_cartas = []
         self.pares_achados = 0
 
-        self.qtd_cartas = len(self.imagens_silabas) * 2
+        self.qtd_cartas = int(len(self.imagens)) * 2
         self.cartas_viradas = []
 
         self.jogadas_feitas = 0
@@ -75,7 +78,7 @@ class Partida:
         for i in range(self.qtd_cartas):
             if i % 2 == 0 and not i < 1:
                 index += 1
-            carta = Carta(self.imagens_silabas[index], self.imagem_verso_carta, self.SILABAS[index])
+            carta = Carta(self.imagens[self.SILABAS[index]][-1], self.verso, self.gerenciador_imagens, self.SILABAS[index])
             self.deck_cartas.append(carta)
 
     def posicionar_cartas(self):
@@ -99,12 +102,9 @@ class Partida:
             carta1.set_achada()
             carta2.set_achada()
             self.pares_achados += 1
+            self.jogadas_feitas = 0
 
-            print("pares achados ", self.pares_achados)
-
-            self.desvirando_carta = True
-        else:
-            self.desvirando_carta = True
+        self.desvirando_carta = True
 
     def desvirar_cartas_erradas(self):
         if self.desvirando_carta:
@@ -112,7 +112,7 @@ class Partida:
             if self.timer >= self.tempo_desvirar_carta:
                 for carta in self.cartas_viradas:
                     if not carta.foi_achada():
-                        carta.virar()
+                        carta.desvirar()
                 self.timer = 0
                 self.jogadas_feitas = 0
                 self.cartas_viradas.clear()
@@ -125,7 +125,7 @@ class Partida:
     def update(self, events):
         for carta in self.deck_cartas:
             self.input_handler(events, carta)
-
+            carta.update()
         self.desvirar_cartas_erradas()
 
     def input_handler(self, events, carta):
@@ -137,7 +137,6 @@ class Partida:
                             carta.virar()
                             self.jogadas_feitas += 1
                             self.cartas_viradas.append(carta)
-                            print("jogadas: ",self.jogadas_feitas,"cartas viradas: ",len(self.cartas_viradas))
                         if self.jogadas_feitas == 2 and self.desvirando_carta is False:
                             self.verificar_cartas_viradas()
                         break

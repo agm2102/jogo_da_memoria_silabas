@@ -32,7 +32,7 @@ class Game:
             self.handle_events()
             self.update()
             self.render()
-            self.clock.tick(30)
+            self.clock.tick(60)
         pygame.quit()
 
     def handle_events(self):

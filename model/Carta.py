@@ -1,10 +1,15 @@
 import pygame
 
 from config import Settings
+from systems.Animation import Animation
+from systems.GerenciadorAnimacoes import GerenciadorAnimacoes
 
 
 class Carta:
-    def __init__(self, frente, verso, silaba):
+    def __init__(self, frente, verso, gerenciador_imagens, silaba):
+
+        self.gerenciador_animacoes = GerenciadorAnimacoes(gerenciador_imagens,silaba)
+
         self.rect = None
         self.frente = frente
         self.verso = verso
@@ -14,16 +19,32 @@ class Carta:
         self.y = 0
 
         self.virada = False
+        self.virando = False
         self.achada = False
 
     def virar(self):
-        self.virada = not self.virada
+        self.virando = True
+        self.gerenciador_animacoes.play_animation(self.gerenciador_animacoes.VIRAR)
+
+    def desvirar(self):
+        self.virando = True
+        self.gerenciador_animacoes.play_animation(self.gerenciador_animacoes.DESVIRAR)
 
     def draw(self, tela):
-        if self.virada:
+        if self.virando:
+            tela.blit(self.gerenciador_animacoes.get_frame(), (self.x, self.y))
+        elif self.virada:
             tela.blit(self.frente, (self.x, self.y))
         else:
             tela.blit(self.verso, (self.x, self.y))
+
+    def update(self):
+        if not self.gerenciador_animacoes.animacao_atual_finalizada():
+            self.gerenciador_animacoes.update()
+        else:
+            if self.virando:
+                self.virada = not self.virada
+                self.virando = False
 
     def set_x(self, x):
         self.x = x
